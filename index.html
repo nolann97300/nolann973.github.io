@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boîte à Questions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      color: white;
+      font-family: 'Roboto', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header img {
+      max-width: 100px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
+    }
+
+    .question-box {
+      font-size: 1.5em;
+      padding: 15px;
+      border: 2px solid white;
+      border-radius: 10px;
+      min-height: 100px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+      background-color: rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .controls input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+    }
+
+    .controls button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      background-color: white;
+      color: black;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      margin-bottom: 10px;
+    }
+
+    .controls button:hover {
+      background-color: gray;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .nav-buttons button {
+      width: 48%;
+    }
+
+    .history {
+      margin-top: 20px;
+      text-align: left;
+      color: white;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid white;
+      border-radius: 10px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .history h2 {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
+    .history ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .history ul li {
+      font-size: 1em;
+      margin-bottom: 5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      padding-bottom: 5px;
+    }
+
+    @media (min-width: 600px) {
+      .question-box {
+        font-size: 2em;
+      }
+
+      .controls button {
+        font-size: 1.2em;
+      }
+
+      .history {
+        padding: 20px;
+        max-height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img src="logo.jpg" alt="Logo">
+    </header>
+    <div class="question-box" id="questionBox">Ajoutez vos questions ici</div>
+    <div class="controls">
+      <input type="text" id="questionInput" placeholder="Tapez une question" />
+      <button onclick="addQuestion()">Ajouter</button>
+      <div class="nav-buttons">
+        <button onclick="prevQuestion()">Retour</button>
+        <button onclick="nextQuestion()">Suivant</button>
+      </div>
+    </div>
+    <div class="history">
+      <h2>Historique des Questions</h2>
+      <ul id="historyList"></ul>
+    </div>
+  </div>
+  <script>
+    
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(() => console.log('Service Worker enregistré'))
+            .catch((error) => console.log('Erreur Service Worker:', error));
+    }
+
+    const questions = [];
+    let currentIndex = 0;
+
+    function addQuestion() {
+      const input = document.getElementById('questionInput');
+      const question = input.value.trim();
+
+      if (question) {
+        questions.push(question);
+        input.value = '';
+        updateHistory();
+        alert('Question ajoutée !');
+      }
+    }
+
+    function nextQuestion() {
+      if (questions.length === 0) {
+        alert("Ajoutez d'abord des questions !");
+        return;
+      }
+
+      currentIndex = (currentIndex + 1) % questions.length;
+      updateQuestionBox();
+    }
+
+    function prevQuestion() {
+      if (questions.length === 0) {
+        alert("Ajoutez d'abord des questions !");
+        return;
+      }
+
+      currentIndex = (currentIndex - 1 + questions.length) % questions.length;
+      updateQuestionBox();
+    }
+
+    function updateQuestionBox() {
+      const questionBox = document.getElementById('questionBox');
+      questionBox.textContent = questions[currentIndex];
+    }
+
+    function updateHistory() {
+      const historyList = document.getElementById('historyList');
+      historyList.innerHTML = '';
+
+      questions.forEach((question, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}. ${question}`;
+        historyList.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
